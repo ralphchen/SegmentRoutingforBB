@@ -81,7 +81,7 @@ Label  Label       or ID              Interface                    Switched
 
 断开CR2-PE5链路：
 
-![1571048341807](1571048341807.png)
+![1571048341807](img/1571048341807.png)
 
 
 
