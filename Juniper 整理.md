@@ -26,6 +26,8 @@ inet.0 路由表
 
 inet.3 标签交换表
 
+
+
 ```
 mpls {
         traffic-engineering {
@@ -49,7 +51,8 @@ bgp vpnv4的路由带color属性的话，下一跳为3.3.3.3-25<c>  会到inetco
 > set protocols isis rib-group inet3 l-isis-inetcolor
 > ```
 >
-> 
+
+
 
 配置完以后，
 
@@ -167,6 +170,68 @@ ctrip@PE5> show route 3.3.3.3 table inet.0 extensive active-path | match "entr|w
 > cloned (clon)—(TCP or multicast only) Cloned route.
 >
 > 本地设备和那个路由有tcp会话，于是在转发表clone一个
+
+
+
+
+
+### 问题6 路由条目hidden
+
+在路由表中，显示有些路由条目hidden
+
+```
+ctrip@PE5> show route table ctrip1000.inet         
+
+ctrip1000.inet.0: 125 destinations, 365 routes (6 active, 0 holddown, 357 hidden)
++ = Active Route, - = Last Active, * = Both
+
+22.22.22.22/32     *[BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 2.2.2.2
+                      AS path: ?, validation-state: unverified
+                    >  to 10.5.6.6 via xe-0/1/4.0, Push 24017, Push 17002(top)
+33.33.33.33/32     *[BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 3.3.3.3
+                      AS path: ?, validation-state: unverified
+                    >  to 10.5.6.6 via xe-0/1/4.0, Push 24012, Push 17003(top)
+44.44.44.44/32     *[BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 2.2.2.2
+                      AS path: I, validation-state: unverified
+                    >  to 10.5.6.6 via xe-0/1/4.0, Push 48259, Push 17004(top)
+                    [BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 3.3.3.3
+                      AS path: I, validation-state: unverified
+                    >  to 10.5.6.6 via xe-0/1/4.0, Push 48259, Push 17004(top)
+                    [BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 6.6.6.6
+                      AS path: I, validation-state: unverified
+                    >  to 10.5.6.6 via xe-0/1/4.0, Push 48259, Push 17004(top)
+55.55.55.55/32     *[Direct/0] 7w6d 00:48:55
+                    >  via lo0.5
+115.115.115.0/24   *[Direct/0] 7w4d 23:29:56
+                    >  via xe-0/1/7.0
+115.115.115.1/32   *[Local/0] 7w4d 23:29:56
+                       Local via xe-0/1/7.0
+```
+
+> 通常是下一跳不可达会导致hidden
+
+![image-20191119153524507](img/image-20191119153524507.png)
+
+经验证发现，之前定义的non-color SR-TE LSP如下
+
+```
+[edit protocols source-packet-routing]
+ctrip@PE5# show 
+lsp-external-controller pccd;
+segment-list path-PE5-PE1 {
+    segCR3 label 17003;
+    segCR2 label 17002;
+    segPE1 label 17001;
+}
+source-routing-path PE5-PE1 {
+    to 1.1.1.1;
+    primary {
+        path-PE5-PE1;
+    }
+}
+```
+
+而在17003非PE5的直连下一跳，所以导致该路由下一跳变为无效。这一点在和juniper进行确认，理论上，路由器不会验证LSP的合法性。这一点，留待juniper工程师确认。
 
 
 
