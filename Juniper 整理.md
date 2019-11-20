@@ -231,8 +231,20 @@ source-routing-path PE5-PE1 {
 }
 ```
 
-而在17003非PE5的直连下一跳，所以导致该路由下一跳变为无效。这一点在和juniper进行确认，理论上，路由器不会验证LSP的合法性。这一点，留待juniper工程师确认。
+PE5-CR3的链路为down，vpn路由就变为无效，而当PE5-CR3间链路up了之后，这些vpn路由即为有效
 
+原因分析：默认情况下，接口支持的的maximum label数量为3个，在该例中定义的路径中有3个label，再加上VPNlabel的话一共有4个label。而当PE5-CR3之间的链路为down的情况下，会压入所有这4个label，进行转发。而当PE5-CR3链路up了之后，17003label其实会被pop，这样只有3个label被压入转发给下一跳CR3。
 
+解决方案：
+
+1. 接口下，设置maximum label，juniper支持的最大标签栈为16
+
+```
+ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
+```
+
+2. 全局设置
+
+   
 
 ### 问题7：

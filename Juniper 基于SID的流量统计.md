@@ -94,3 +94,18 @@ Sensor Information :
 
 
 3- 通过sensor-id 查看流量统计
+
+从PE5定义了一条到PE1的 non-color SR-TE LSP PE5-PE1
+
+打流前：
+
+![image-20191119211308278](img/image-20191119211308278.png)
+
+打流中：
+
+![image-20191119211526171](img/image-20191119211526171.png)
+
+
+
+限制说明：
+
