@@ -1,5 +1,7 @@
 ## NCS 5500 设备性能
 
+整理自：xrdocs.io
+
 ### 硬件
 
  ![Resources](img/resources.jpg) 
@@ -45,6 +47,8 @@ RP/0/RP0/CPU0:NCS5500(config)#
 
 
 
+
+
 ####  scale line cards 
 
  ![eTCAM IPv4 Order](img/-SE-IPv4-order.jpg) 
@@ -52,3 +56,4 @@ RP/0/RP0/CPU0:NCS5500(config)#
 > - LEM is 786k large
 > - eTCAM can offer up to 2M IPv4 entries
 > - Total IPv4 scale for scale systems is 786k + 2M = 2,786k routes
+

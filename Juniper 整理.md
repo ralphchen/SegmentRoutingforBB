@@ -54,6 +54,20 @@ bgp vpnv4的路由带color属性的话，下一跳为3.3.3.3-25<c>  会到inetco
 
 
 
+关于上面三条命令的解释：
+
+> 第一、二条命令，是创建一个rib-group，叫 l-isis-inetcolor
+>
+> 第三条命令是应用
+>
+> 但是应用的地方不同，会反过来决定第一、二步创建rib-group时表的前后顺序不一样；primary rib的表要放在第一个。这个例子中L-ISIS路由默认的primary rib 是inet.3, 所以在第一、二步创建表的时候inet.3必须写在第一个。
+
+以下为流程示意图：
+
+![image-20191129120759812](img/image-20191129120759812.png)
+
+
+
 配置完以后，
 
 ```
@@ -247,4 +261,4 @@ ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
 
    
 
-### 问题7：
+### 
