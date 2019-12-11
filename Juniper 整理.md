@@ -54,6 +54,31 @@ bgp vpnv4的路由带color属性的话，下一跳为3.3.3.3-25<c>  会到inetco
 
 
 
+关于上面三条命令的解释：
+
+> 第一、二条命令，是创建一个rib-group，叫 l-isis-inetcolor
+>
+> 第三条命令是应用
+>
+> 但是应用的地方不同，会反过来决定第一、二步创建rib-group时表的前后顺序不一样；primary rib的表要放在第一个。这个例子中L-ISIS路由默认的primary rib 是inet.3, 所以在第一、二步创建表的时候inet.3必须写在第一个。
+
+下面是截取junos的一篇KB的说明  https://kb.juniper.net/InfoCenter/index?page=content&id=kb16133&actp=METADATA 
+
+从下面的配置可以看出，import-rib后面的第一个选项，其实是source-routing table，后面再跟的参数就是指定要导入进哪张路由表：
+
+```
+routing-option {
+    rib-group {
+        <rib-group name> {
+            import-rib [ source-routing table destination routing table1 destination routing table2 ......... ]
+```
+
+以下为流程示意图：
+
+![image-20191129120759812](img/image-20191129120759812.png)
+
+
+
 配置完以后，
 
 ```
@@ -231,8 +256,20 @@ source-routing-path PE5-PE1 {
 }
 ```
 
-而在17003非PE5的直连下一跳，所以导致该路由下一跳变为无效。这一点在和juniper进行确认，理论上，路由器不会验证LSP的合法性。这一点，留待juniper工程师确认。
+PE5-CR3的链路为down，vpn路由就变为无效，而当PE5-CR3间链路up了之后，这些vpn路由即为有效
 
+原因分析：默认情况下，接口支持的的maximum label数量为3个，在该例中定义的路径中有3个label，再加上VPNlabel的话一共有4个label。而当PE5-CR3之间的链路为down的情况下，会压入所有这4个label，进行转发。而当PE5-CR3链路up了之后，17003label其实会被pop，这样只有3个label被压入转发给下一跳CR3。
 
+解决方案：
 
-### 问题7：
+1. 接口下，设置maximum label，juniper支持的最大标签栈为16
+
+```
+ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
+```
+
+2. 全局设置
+
+   
+
+### 
