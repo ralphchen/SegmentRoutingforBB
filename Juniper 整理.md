@@ -62,6 +62,17 @@ bgp vpnv4的路由带color属性的话，下一跳为3.3.3.3-25<c>  会到inetco
 >
 > 但是应用的地方不同，会反过来决定第一、二步创建rib-group时表的前后顺序不一样；primary rib的表要放在第一个。这个例子中L-ISIS路由默认的primary rib 是inet.3, 所以在第一、二步创建表的时候inet.3必须写在第一个。
 
+下面是截取junos的一篇KB的说明  https://kb.juniper.net/InfoCenter/index?page=content&id=kb16133&actp=METADATA 
+
+从下面的配置可以看出，import-rib后面的第一个选项，其实是source-routing table，后面再跟的参数就是指定要导入进哪张路由表：
+
+```
+routing-option {
+    rib-group {
+        <rib-group name> {
+            import-rib [ source-routing table destination routing table1 destination routing table2 ......... ]
+```
+
 以下为流程示意图：
 
 ![image-20191129120759812](img/image-20191129120759812.png)
