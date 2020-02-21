@@ -268,8 +268,12 @@ PE5-CR3的链路为down，vpn路由就变为无效，而当PE5-CR3间链路up了
 ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
 ```
 
-2. 全局设置
+2. 全局设置（是否支持？）
 
-   
+
+
+### 
+
+ 
 
 ### 
