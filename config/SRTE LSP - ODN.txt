@@ -1,0 +1,27 @@
+根据收到的bgp路由自动创建一条到R5 10.9.9.5的SRTE隧道，隧道路径需经过R3节点
+
+lab@vmx1# show protocols source-packet-routing
+lsp-external-controller pccd;
+segment-list path-r3-dy { ##不能包含隧道末端节点，否则隧道会down;
+    dynamic;
+    seg-r3 label 402003; ##动态隧道经过的节点
+}
+source-routing-path-template to-r5-lsp {
+    metric 9;
+    sr-preference 9;
+    primary {
+        path-r3-dy;
+    }
+}
+lab@vmx1# show routing-options dynamic-tunnels
+to-r5-tunnel {
+    spring-te {
+        source-routing-path-template {
+            to-r5-lsp;
+        }
+        destination-networks { ##bgp路由下一跳需要落在指定范围，即会触发触发自动创建
+            10.9.9.5/32;
+            inactive: 10.9.9.0/24;
+        }
+    }
+}

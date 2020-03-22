@@ -58,13 +58,27 @@ router bgp 65510
   !
 ```
 
-
-
 PE2同PE1，唯一区别是接口没有dot1q
 
 ### PE 5 (juniper配置）
 
+以下为PE的接入侧端口为dot1q封装
+
 ```
+[edit interfaces xe-0/1/7]
+ctrip@PE5# show 
+flexible-vlan-tagging
+encapsulation flexible-ethernet-services;
+gigether-options {
+    auto-negotiation;
+    speed 1g;
+}
+unit 500 {
+    encapsulation vlan-bridge;
+    vlan-id 500
+}
+
+
 [edit routing-instances evpn-l2]
 ctrip@PE5# show 
 instance-type evpn;
@@ -78,6 +92,40 @@ interface xe-0/1/7.500;
 no-normalization;
 route-distinguisher 5555:5555;
 vrf-target target:2000:2000;
+
+```
+
+
+
+以下为PE的接入侧端口为null封装
+
+```
+[edit interfaces xe-0/1/7]
+ctrip@PE5# show 
+encapsulation ethernet-bridge;
+gigether-options {
+    auto-negotiation;
+    
+    speed 1g;
+}
+unit 0 {
+    family bridge;
+}
+
+
+[edit routing-instances evpn-l2]
+ctrip@PE5# show 
+instance-type evpn;
+protocols {
+    evpn {
+        label-allocation per-instance;
+    }
+}
+vlan-id none;
+interface xe-0/1/7.0;
+no-normalization;
+route-distinguisher 5555:5555;
+vrf-target target:2000:2000;
 ```
 
 
@@ -85,4 +133,6 @@ vrf-target target:2000:2000;
 ### 问题1
 
 一开始CE2无法ping同CE5，当CE5向CE2发起ping或者ping一个不存在的地址之后，CE2能够ping通CE5。
+
+
 
