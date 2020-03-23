@@ -1,81 +1,5 @@
 #  SR-TE LSP
 
-## 1. 基于COMMUNITY，选择LSP
-
-![image-20200323003612152](img/image-20200323003612152.png)
-
-在CR5上，定义了，两条non-color SR-TE LSP
-
-```
-[edit protocols source-packet-routing]
-ctrip@CR5# show 
-lsp-external-controller pccd;
-maximum-segment-list-depth 16;
-segment-list LIST2 {
-    hop1 label 34002;
-    hop2 label 34003;
-    hop3 label 34004;
-}
-segment-list LST_CR4_2 {
-    hop1 label 34003;
-    hop2 label 34002;
-    hop3 label 34004;
-}
-
-
-source-routing-path toCR4_ECMP {
-    to 4.4.4.4;
-    preference 1;
-    primary {
-        LIST2;
-    }
-}
-source-routing-path toCR4_2 {
-    to 4.4.4.4;
-    preference 1;
-    primary {
-        LST_CR4_2;
-    }
-}
-```
-
-
-
-定义了一条policy-statement
-
-community 为14:14和114:114的，分别会调用不同的LSP:
-
-```
-ctrip@CR5# run show configuration policy-options 
-policy-statement LSP_SLCT {
-    term 1 {
-        from community comm14
-        then {
-            install-nexthop lsp toCR4_ECMP;
-            accept;
-        }
-    }
-    term 2 {
-        from community comm114;
-        then {
-            install-nexthop lsp toCR4_2;
-            accept;
-        }
-    }
-}
-
-community comm114 members 114:114;
-community comm14 members 14:14;
-```
-
-
-
-查看路由表，可以发现到14.14.14.14/32和 114.114.114.14/32 分别选择了不同的路径：
-
-![image-20200323004234415](img/image-20200323004234415.png)
-
-## 
-
 ## 2. admin group
 
 
@@ -134,3 +58,63 @@ Sensor-name: ingress-CR5-CR2, Id: 3758096387
 问题： 
 
 到第一跳 3.3.3.3，是否是负载均衡
+
+
+
+## PRI_PATH之间的负载均衡
+
+在一条LSP中，配置了多条primary path
+
+```
+ctrip@CR5# run show configuration protocols source-packet-routing source-routing-path toCR4_2
+to 4.4.4.4;
+preference 1;
+primary {
+    LST_CR4_2 weight 2;
+    LIST2 weight 3;
+}
+```
+
+
+
+根据下面配置，114：114的路由，会被引导到toCR4_2这条path
+
+```
+ctrip@CR5# run show configuration policy-options policy-statement LSP_SLCT
+term 1 {
+    from community 14:14;
+    then {
+        install-nexthop lsp toCR4_ECMP;
+        accept;
+    }
+}
+term 2 {
+    from community 114:114;
+    then {
+        install-nexthop lsp toCR4_2;
+        accept;
+    }
+}
+```
+
+
+
+在路由表中，并未体现：
+
+```
+ctrip@CR5> show route 114.114.114.14 table ctrip1000.inet
+
+ctrip1000.inet.0: 3 destinations, 5 routes (3 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+114.114.114.14/32  *[BGP/170] 00:15:02, MED 0, localpref 100, from 2.2.2.2
+                      AS path: ?, validation-state: unverified
+                    >  to 10.3.5.3 via xe-0/1/0.0, Push 24006, Push 34004, Push 34002(top)
+                       to 10.33.55.3 via xe-0/1/1.0, Push 24006, Push 34004, Push 34002(top)
+                    [BGP/170] 00:15:02, MED 0, localpref 100, from 3.3.3.3
+                      AS path: ?, validation-state: unverified
+                    >  to 10.3.5.3 via xe-0/1/0.0, Push 24006, Push 34004, Push 34002(top)
+                       to 10.33.55.3 via xe-0/1/1.0, Push 24006, Push 34004, Push 34002(top)
+
+```
+

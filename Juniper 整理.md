@@ -56,7 +56,13 @@ bgp vpnv4的路由带color属性的话，下一跳为3.3.3.3-25<c>  会到inetco
 
 关于上面三条命令的解释：
 
-> 第一、二条命令，是创建一个rib-group，叫 l-isis-inetcolor
+> 第一、二条命令，是创建一个
+>
+> ```
+> 
+> ```
+>
+> rib-group，叫 l-isis-inetcolor
 >
 > 第三条命令是应用
 >
@@ -165,8 +171,6 @@ Juniper 工程师答复：
 
 该例子中的2个下一跳，第一个为实际转发流量，第二个为保护路径
 
-
-
 ![1571651703351](img/1571651703351.png)
 
 该例子中的2个下一跳为等价路径
@@ -269,3 +273,7 @@ ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
 ```
 
 2. 全局设置（是否支持？）
+
+
+
+### 
