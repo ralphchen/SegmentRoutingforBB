@@ -7,7 +7,7 @@
 1- 配置 telemetry
 
 ```
-ctrip@PE5> show configuration services analytics 
+admin@PE5> show configuration services analytics 
 streaming-server ns {
     remote-address 19.19.19.9;
     remote-port 3000;
@@ -35,12 +35,12 @@ sensor srte-tunnel-ingress {
 ```
 
 ```
-ctrip@PE5> show configuration protocols source-packet-routing telemetry 
+admin@PE5> show configuration protocols source-packet-routing telemetry 
 statistics;
 ```
 
 ```
-ctrip@PE5> show configuration protocols isis source-packet-routing 
+admin@PE5> show configuration protocols isis source-packet-routing 
 sensor-based-stats {
     per-sid ingress egress;
 }
@@ -59,7 +59,7 @@ traffic-statistics {
 2- 查看telemetry sensor-id
 
 ```
-ctrip@PE5> show agent sensors | match "resour|sensor" | except parent    
+admin@PE5> show agent sensors | match "resour|sensor" | except parent    
 Sensor Information : 
     Resource                                : /junos/services/segment-routing/sid/usage/ 
     Sensor-id                               : 2903098284            

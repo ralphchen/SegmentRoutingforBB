@@ -8,7 +8,7 @@
 
 ```
 [edit protocols source-packet-routing]
-ctrip@PE5# show 
+admin@PE5# show 
 sr-preference 5; z
 segment-list LIST1 {
     hop1 label 17003;
@@ -28,7 +28,7 @@ source-routing-path toPE2 {
 
 
 ```
-ctrip@PE5> show spring-traffic-engineering lsp name toPE2 detail 
+admin@PE5> show spring-traffic-engineering lsp name toPE2 detail 
 Name: toPE2
 Tunnel-source: Static configuration
 To: 2.2.2.2-30<c>
@@ -53,9 +53,9 @@ State: Up
 
 
 ```
-ctrip@PE5> show route protocol bgp 122.122.122.122 table ctrip1000.inet detail   
+admin@PE5> show route protocol bgp 122.122.122.122 table admin1000.inet detail   
 
-ctrip1000.inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
+admin1000.inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
 122.122.122.122/32 (1 entry, 1 announced)
         *BGP    Preference: 170/-101
                 Route Distinguisher: 1000:1000
@@ -107,7 +107,7 @@ ctrip1000.inet.0: 10 destinations, 10 routes (10 active, 0 holddown, 0 hidden)
 
 ```
 [edit protocols source-packet-routing]
-ctrip@CR5# show 
+admin@CR5# show 
 lsp-external-controller pccd;
 maximum-segment-list-depth 16;
 segment-list LST_234 {
@@ -145,7 +145,7 @@ source-routing-path toCR4_1 {
 community 为14:14和114:114的，分别会调用不同的LSP:
 
 ```
-ctrip@CR5# run show configuration policy-options 
+admin@CR5# run show configuration policy-options 
 policy-statement LSP_SLCT {
     term 1 {
         from community comm14

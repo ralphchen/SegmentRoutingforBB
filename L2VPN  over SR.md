@@ -66,7 +66,7 @@ PE2同PE1，唯一区别是接口没有dot1q
 
 ```
 [edit interfaces xe-0/1/7]
-ctrip@PE5# show 
+admin@PE5# show 
 flexible-vlan-tagging
 encapsulation flexible-ethernet-services;
 gigether-options {
@@ -80,7 +80,7 @@ unit 500 {
 
 
 [edit routing-instances evpn-l2]
-ctrip@PE5# show 
+admin@PE5# show 
 instance-type evpn;
 protocols {
     evpn {
@@ -101,7 +101,7 @@ vrf-target target:2000:2000;
 
 ```
 [edit interfaces xe-0/1/7]
-ctrip@PE5# show 
+admin@PE5# show 
 encapsulation ethernet-bridge;
 gigether-options {
     auto-negotiation;
@@ -114,7 +114,7 @@ unit 0 {
 
 
 [edit routing-instances evpn-l2]
-ctrip@PE5# show 
+admin@PE5# show 
 instance-type evpn;
 protocols {
     evpn {

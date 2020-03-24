@@ -88,7 +88,7 @@ routing-option {
 配置完以后，
 
 ```
-ctrip@PE5# run show route table inetcolor.0 
+admin@PE5# run show route table inetcolor.0 
 
 inetcolor.0: 5 destinations, 5 routes (5 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -124,7 +124,7 @@ inetcolor.0: 5 destinations, 5 routes (5 active, 0 holddown, 0 hidden)
 例如，下面的路由为等价路径：
 
 ```
-ctrip@PE5# run show route table inet.3 1.1.1.1 
+admin@PE5# run show route table inet.3 1.1.1.1 
 
 inet.3: 5 destinations, 6 routes (5 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -139,7 +139,7 @@ inet.3: 5 destinations, 6 routes (5 active, 0 holddown, 0 hidden)
 而下面的路由的第二跳其实是保护路径
 
 ```
-ctrip@PE5# run show route table inet.3 3.3.3.3                                                                      
+admin@PE5# run show route table inet.3 3.3.3.3                                                                      
 
 inet.3: 5 destinations, 6 routes (5 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -152,7 +152,7 @@ inet.3: 5 destinations, 6 routes (5 active, 0 holddown, 0 hidden)
 在关闭了ti-lfa之后：
 
 ```
-ctrip@PE5# run show route table inet.3 3.3.3.3 
+admin@PE5# run show route table inet.3 3.3.3.3 
 
 inet.3: 5 destinations, 6 routes (5 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -180,7 +180,7 @@ Juniper 工程师答复：
 更快的查询方式：
 
 ```
-ctrip@PE5> show route 3.3.3.3 table inet.0 extensive active-path | match "entr|weight" 
+admin@PE5> show route 3.3.3.3 table inet.0 extensive active-path | match "entr|weight" 
 3.3.3.3/32 (2 entries, 1 announced)
                 Next hop: 10.3.5.3 via ae0.101 weight 0x1, selected
                 Next hop: 10.2.5.2 via xe-0/1/1.101 weight 0xf000
@@ -209,9 +209,9 @@ ctrip@PE5> show route 3.3.3.3 table inet.0 extensive active-path | match "entr|w
 在路由表中，显示有些路由条目hidden
 
 ```
-ctrip@PE5> show route table ctrip1000.inet         
+admin@PE5> show route table admin1000.inet         
 
-ctrip1000.inet.0: 125 destinations, 365 routes (6 active, 0 holddown, 357 hidden)
+admin1000.inet.0: 125 destinations, 365 routes (6 active, 0 holddown, 357 hidden)
 + = Active Route, - = Last Active, * = Both
 
 22.22.22.22/32     *[BGP/170] 2w4d 04:59:53, MED 0, localpref 100, from 2.2.2.2
@@ -245,7 +245,7 @@ ctrip1000.inet.0: 125 destinations, 365 routes (6 active, 0 holddown, 357 hidden
 
 ```
 [edit protocols source-packet-routing]
-ctrip@PE5# show 
+admin@PE5# show 
 lsp-external-controller pccd;
 segment-list path-PE5-PE1 {
     segCR3 label 17003;
@@ -269,7 +269,7 @@ PE5-CR3的链路为down，vpn路由就变为无效，而当PE5-CR3间链路up了
 1. 接口下，设置maximum label，juniper支持的最大标签栈为16
 
 ```
-ctrip@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
+admin@PE5# set interfaces xe-0/1/2 unit 0 family mpls maximum-labels 10
 ```
 
 2. 全局设置（是否支持？）

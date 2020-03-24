@@ -10,7 +10,7 @@
 
 ```
 [edit protocols isis]
-ctrip@CR6# show 
+admin@CR6# show 
 backup-spf-options {
     use-post-convergence-lfa;
 }
@@ -26,7 +26,7 @@ interface ge-2/1/0.0 {
 ### 验证路由表
 
 ```
-ctrip@CR6> show route table inet.3 1.1.1.1 
+admin@CR6> show route table inet.3 1.1.1.1 
 
 inet.3: 5 destinations, 5 routes (5 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -43,7 +43,7 @@ inet.3: 5 destinations, 5 routes (5 active, 0 holddown, 0 hidden)
 从转发表看，有2个下一跳，实际上并没有负载均衡，另外一个下一跳实际是TI-LFA的保护路径
 
 ```
-ctrip@CR6> show route table mpls.0 label 17001         
+admin@CR6> show route table mpls.0 label 17001         
 
 mpls.0: 20 destinations, 20 routes (20 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -73,7 +73,7 @@ mpls.0: 20 destinations, 20 routes (20 active, 0 holddown, 0 hidden)
 此时看CR6的路由表，18是PE5-CR2的adj-sid
 
 ```
-ctrip@CR6> show route table mpls.0 label 17001      
+admin@CR6> show route table mpls.0 label 17001      
 
 mpls.0: 17 destinations, 17 routes (17 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
@@ -88,7 +88,7 @@ mpls.0: 17 destinations, 17 routes (17 active, 0 holddown, 0 hidden)
 查看CR6的转发表
 
 ```
-ctrip@CR6> show route forwarding-table label 17001    
+admin@CR6> show route forwarding-table label 17001    
 Routing table: default.mpls
 MPLS:
 Destination        Type RtRef Next hop           Type Index    NhRef Netif

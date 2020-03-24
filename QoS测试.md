@@ -69,7 +69,7 @@ class-map match-any ce1-ce5
 ```
 interface GigabitEthernet0/0/0/26.100
  service-policy input Ing_Policing
- vrf ctrip1000
+ vrf admin1000
  ipv4 address 111.111.111.1 255.255.255.0
  encapsulation dot1q 100
 ```

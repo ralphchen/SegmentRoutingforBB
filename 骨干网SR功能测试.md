@@ -9,7 +9,7 @@
 ### Cisco ECMP
 
 ```
-RP/0/RP0/CPU0:PE1#show cef vrf ctrip1000 115.115.115.115 detail 
+RP/0/RP0/CPU0:PE1#show cef vrf admin1000 115.115.115.115 detail 
 Thu Sep 26 15:55:36.659 UTC
 115.115.115.0/24, version 72, internal 0x5000001 0x0 (ptr 0x97d2ceec) [1], 0x0 (0x0), 0x208 (0x984244a8)
  Updated Sep 26 10:10:33.300
@@ -77,7 +77,7 @@ Label  Label       or ID              Interface                    Switched
 ECMP路径选择命令查看
 
 ```
-RP/0/RP0/CPU0:PE1#show cef vrf ctrip1000 exact-route 111.111.111.11 115.115.115.15 protocol udp source-port 45970 destination-port 5201 ingress-interface gigabitEthernet 0/0$
+RP/0/RP0/CPU0:PE1#show cef vrf admin1000 exact-route 111.111.111.11 115.115.115.15 protocol udp source-port 45970 destination-port 5201 ingress-interface gigabitEthernet 0/0$
 Thu Oct 10 05:37:08.377 UTC
 115.115.115.0/24, version 117, internal 0x5000001 0x0 (ptr 0x97d2ceec) [1], 0x0 (0x0), 0x208 (0x98424628)
  Updated Oct 10 05:33:10.997 
@@ -104,7 +104,7 @@ PE端配置：
 
 ```
 router bgp 65510
- vrf ctrip1000
+ vrf admin1000
   rd 1000:1000
   address-family ipv4 unicast
    label mode per-vrf
@@ -132,7 +132,7 @@ Origin codes: i - IGP, e - EGP, ? - incomplete
    Network            Next Hop            Metric LocPrf Weight Path
 Route Distinguisher: 2:2 (default for vrf CE)
 *> 122.122.122.122/32 0.0.0.0                  0         32768 i
-Route Distinguisher: 1000:1000 (default for vrf ctrip1000)
+Route Distinguisher: 1000:1000 (default for vrf admin1000)
 *> 11.11.11.11/32     0.0.0.0                  0         32768 ?
 *>i22.22.22.22/32     2.2.2.2                  0    100      0 ?
 *>i33.33.33.33/32     3.3.3.3                  0    100      0 ?
@@ -160,13 +160,13 @@ Route Distinguisher: 5000:5000
 路由表：
 
 ```
-RP/0/RP0/CPU0:PE1#show route vrf ctrip1000 
+RP/0/RP0/CPU0:PE1#show route vrf admin1000 
 ...omitted...
 B    115.115.115.0/24 [200/0] via 4.4.4.4 (nexthop in vrf default), 00:03:08
                       [200/0] via 5.5.5.5 (nexthop in vrf default), 00:03:08
                       
                       
-RP/0/RP0/CPU0:PE1#show route vrf ctrip1000 115.115.115.0
+RP/0/RP0/CPU0:PE1#show route vrf admin1000 115.115.115.0
 Fri Sep 27 09:20:00.449 UTC
 
 Routing entry for 115.115.115.0/24
@@ -185,7 +185,7 @@ Routing entry for 115.115.115.0/24
 CEF:
 
 ```
-RP/0/RP0/CPU0:PE1#show cef vrf ctrip1000 115.115.115.0 
+RP/0/RP0/CPU0:PE1#show cef vrf admin1000 115.115.115.0 
 Fri Sep 27 09:20:57.131 UTC
 115.115.115.0/24, version 85, internal 0x5000001 0x0 (ptr 0x97d2ceec) [1], 0x0 (0x0), 0x208 (0x98f2a0f0)
  Updated Sep 27 09:16:46.406
@@ -232,7 +232,7 @@ policy-statement load-balance-packet {
     }
 }
 
-ctrip@PE5# show 
+admin@PE5# show 
 forwarding-table {
     export load-balance-packet;
 }
@@ -243,9 +243,9 @@ forwarding-table {
 路由表中并不体现：
 
 ```
-ctrip@PE5> show route table ctrip1000.inet.0 111.111.111.0 
+admin@PE5> show route table admin1000.inet.0 111.111.111.0 
 
-ctrip1000.inet.0: 9 destinations, 13 routes (9 active, 0 holddown, 0 hidden)
+admin1000.inet.0: 9 destinations, 13 routes (9 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
 
 111.111.111.0/24   *[BGP/170] 15:33:52, MED 0, localpref 100, from 2.2.2.2
@@ -263,8 +263,8 @@ ctrip1000.inet.0: 9 destinations, 13 routes (9 active, 0 holddown, 0 hidden)
 #### Juniper VPN 转发表：
 
 ```
-ctrip@PE5> show route forwarding-table vpn ctrip1000 destination 111.111.111.0 
-Routing table: ctrip1000.inet
+admin@PE5> show route forwarding-table vpn admin1000 destination 111.111.111.0 
+Routing table: admin1000.inet
 Internet:
 Enabled protocols: Bridging, All VLANs, 
 Destination        Type RtRef Next hop           Type Index    NhRef Netif
@@ -279,7 +279,7 @@ Destination        Type RtRef Next hop           Type Index    NhRef Netif
 #### Juniper MPLS转发表：
 
 ```
-ctrip@PE5> show route forwarding-table family mpls label 17001 
+admin@PE5> show route forwarding-table family mpls label 17001 
 Routing table: default.mpls
 MPLS:
 Destination        Type RtRef Next hop           Type Index    NhRef Netif
@@ -394,7 +394,7 @@ Label  Label       or ID              Interface                    Switched
 
 ```
 [edit protocols isis]
-ctrip@CR6# show 
+admin@CR6# show 
 backup-spf-options {
     use-post-convergence-lfa;
 }
@@ -411,7 +411,7 @@ interface xe-2/2/0.0 {
 ### Juniper TI-LFA验证
 
 ```A
-ctrip@CR6> show route table mpls.0 label 17001 
+admin@CR6> show route table mpls.0 label 17001 
 
 mpls.0: 17 destinations, 17 routes (17 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both

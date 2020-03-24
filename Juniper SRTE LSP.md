@@ -1,6 +1,6 @@
 #  SR-TE LSP
 
-## 2. admin group
+## 1. admin group
 
 
 
@@ -28,7 +28,7 @@ set protocols source-packet-routing source-routing-path CR5-CR2 primary pri_path
 
 
 ```
-ctrip@CR5# run show spring-traffic-engineering lsp name  ？ detail 
+admin@CR5# run show spring-traffic-engineering lsp name  ？ detail 
 Name: CR5-CR2
 Tunnel-source: Static configuration
 To: 2.2.2.2
@@ -55,66 +55,92 @@ Sensor-name: ingress-CR5-CR2, Id: 3758096387
 
 
 
-问题： 
+
 
 到第一跳 3.3.3.3，是否是负载均衡
 
 
 
-## PRI_PATH之间的负载均衡
+## 2. PRI_PATH之间的负载均衡
 
-在一条LSP中，配置了多条primary path
+
+
+在一条LSP中，配置了多条primary path，相同权重
 
 ```
-ctrip@CR5# run show configuration protocols source-packet-routing source-routing-path toCR4_2
-to 4.4.4.4;
-preference 1;
-primary {
-    LST_CR4_2 weight 2;
-    LIST2 weight 3;
+admin@CR5> show configuration protocols source-packet-routing 
+segment-list SGL_CR4_24 {
+    hop1 label 34002;
+    hop2 label 34004;
 }
-```
-
-
-
-根据下面配置，114：114的路由，会被引导到toCR4_2这条path
-
-```
-ctrip@CR5# run show configuration policy-options policy-statement LSP_SLCT
-term 1 {
-    from community 14:14;
-    then {
-        install-nexthop lsp toCR4_ECMP;
-        accept;
-    }
+segment-list SGL_CR4_34 {
+    hop1 label 34003;
+    hop2 label 34004;
 }
-term 2 {
-    from community 114:114;
-    then {
-        install-nexthop lsp toCR4_2;
-        accept;
+source-routing-path toCR4_ECMP {
+    to 4.4.4.4;
+    preference 1;
+    primary {
+        SGL_CR4_24 weight 50;
+        SGL_CR4_34 weight 50;
     }
 }
 ```
 
 
 
-在路由表中，并未体现：
+定义多路径解析的policy-statement
 
 ```
-ctrip@CR5> show route 114.114.114.14 table ctrip1000.inet
+admin@CR5> show configuration policy-options 
 
-ctrip1000.inet.0: 3 destinations, 5 routes (3 active, 0 holddown, 0 hidden)
-+ = Active Route, - = Last Active, * = Both
-
-114.114.114.14/32  *[BGP/170] 00:15:02, MED 0, localpref 100, from 2.2.2.2
-                      AS path: ?, validation-state: unverified
-                    >  to 10.3.5.3 via xe-0/1/0.0, Push 24006, Push 34004, Push 34002(top)
-                       to 10.33.55.3 via xe-0/1/1.0, Push 24006, Push 34004, Push 34002(top)
-                    [BGP/170] 00:15:02, MED 0, localpref 100, from 3.3.3.3
-                      AS path: ?, validation-state: unverified
-                    >  to 10.3.5.3 via xe-0/1/0.0, Push 24006, Push 34004, Push 34002(top)
-                       to 10.33.55.3 via xe-0/1/1.0, Push 24006, Push 34004, Push 34002(top)
-
+policy-statement mpath-resolv {
+    term 1 {
+        then multipath-resolve;
+    }
+}
 ```
 
+
+
+在routing option中对bgp vpn路由解析，使用多条LSP路径
+
+```
+admin@CR5> show configuration routing-options 
+resolution {
+    rib bgp.l3vpn.0 {
+        import mpath-resolv;
+    }
+}
+```
+
+
+
+查看路由表可以看到在两条LSP之间进行了50%的负载均衡
+
+```
+admin@CR5> show route 114.114.114.14 active-path detail | match "entri|weight"    
+114.114.114.14/32 (2 entries, 1 announced)
+        Next hop: ELNH Address 0x7e270ec weight 0x1 balance 50%, selected
+                Next hop: 10.3.5.3 via xe-0/1/0.0 weight 0x1
+                Next hop: 10.33.55.3 via xe-0/1/1.0 weight 0x1
+        Next hop: ELNH Address 0x7e2717c weight 0x1 balance 50%
+                Next hop: 10.2.5.2 via xe-0/1/2.0 weight 0x1
+                Next hop: 10.22.55.2 via xe-0/1/3.0 weight 0xf000
+```
+
+
+
+如果没有应用mpath-resolv这条解析策略：
+
+```
+admin@CR5# run show route 114.114.114.14 active-path detail | match "entr|weight" 
+0.0.0.0/0 (1 entry, 1 announced)
+114.114.114.14/32 (2 entries, 1 announced)
+                Next hop: 10.3.5.3 via xe-0/1/0.0 weight 0x1, selected
+                Next hop: 10.33.55.3 via xe-0/1/1.0 weight 0x1, selected
+```
+
+
+
+## 

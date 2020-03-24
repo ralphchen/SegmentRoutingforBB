@@ -8,7 +8,7 @@ juniper配置：
 
 ```
 [edit protocols pcep]
-ctrip@PE5# show 
+admin@PE5# show 
 pce pce1 {
     local-address 5.5.5.5;
     destination-ipv4-address 3.3.3.3;
@@ -24,7 +24,7 @@ pce pce1 {
 juniper验证：
 
 ```
-ctrip@PE5> show path-computation-client status 
+admin@PE5> show path-computation-client status 
 
 Session              Type                        Provisioning   Status         Uptime
   pce1               Stateful Active             On             Up              24          
@@ -44,7 +44,7 @@ pce1 (main)
 
 
 ```
-ctrip@PE5# run show path-computation-client active-pce 
+admin@PE5# run show path-computation-client active-pce 
 
 PCE pce1
 --------------------------------------------
